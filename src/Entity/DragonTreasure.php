@@ -22,6 +22,9 @@ class DragonTreasure
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
+    /**
+     * In Goldstücke
+     */
     #[ORM\Column]
     private ?int $value = null;
 
