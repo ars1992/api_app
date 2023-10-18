@@ -1,12 +1,13 @@
 <?php
-
 namespace App\Entity;
+
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
+use Carbon\Carbon;
 
 use App\Repository\DragonTreasureRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,12 +15,13 @@ use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: DragonTreasureRepository::class)]
 #[ApiResource(
+    shortName: "Dragons",
     description: "An Dragon",
     operations: [
-    new Get(),
+    new Get(uriTemplate: "/dragon-plunder/{id}"),
     new Post(),
     new Put(),
-    new GetCollection(),
+    new GetCollection(uriTemplate: "/dragon-plunder/"),
     ]
 )]
 class DragonTreasure
@@ -45,10 +47,15 @@ class DragonTreasure
     private ?int $coolFactor = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $plunderedAt = null;
 
     #[ORM\Column]
     private ?bool $published = null;
+
+    public function __construct()
+    {
+        $this->plunderedAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -72,9 +79,9 @@ class DragonTreasure
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setTextDescription(string $description): static
     {
-        $this->description = $description;
+        $this->description = nl2br($description);
 
         return $this;
     }
@@ -103,16 +110,14 @@ class DragonTreasure
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getPlunderedAt(): ?\DateTimeImmutable
     {
-        return $this->createdAt;
+        return $this->plunderedAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function getPlunderedAtAgo(): string
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        return Carbon::instance($this->plunderedAt)->diffForHumans();
     }
 
     public function getIsPublished(): ?bool
